@@ -1,0 +1,54 @@
+<?php
+$url ="https://accounts.google.com/o/oauth2/token";
+$fields = array(
+   "client_id"=>"1XXXXXXX03353-XXXXXXXXXXXXXXX.apps.googleusercontent.com", //static data
+   "client_secret"=>"XXXXXXXXXXXXXXX",												//static data			
+   "refresh_token"=>"1/XXXXXXXXXXXXXXX",						//static data
+   "grant_type"=>"refresh_token"															//static data
+);
+
+$ch = curl_init($url);
+
+//set the url, number of POST vars, POST data
+curl_setopt($ch, CURLOPT_POST,count($fields));
+curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+//execute post
+$lResponse_json = curl_exec($ch);
+
+//close connection
+curl_close($ch);
+
+
+$responseObj = json_decode($lResponse_json,true);
+
+$newtoken =  $responseObj['access_token'];
+	 // get data from request and parameter mandatory for recharge
+
+	 // $packageName  = $_REQUEST['packageName'];
+	 // $productId    = $_REQUEST['productId'];
+	 // $token        = $_REQUEST['token']; 
+    
+    // static data for testing 
+	  $packageName = 'com.mobiscreen.girlschat';
+      $productId = 'basic';
+      $token = 'pbclioaihkbnafkgpdhccfko.AO-J1OxYOnkdgbhqXg5jv-IkE0FG3dpTQMKkioi26qw8q0tqB4Qg7SOleuD1-bBoDT3mDriHkNVBDuusryZPHcVYvKi6-BlbV3V1mPVAYAAci2wFHWZ63fw';
+
+$data = file_get_contents("https://www.googleapis.com/androidpublisher/v2/applications/$packageName/purchases/products/$productId/tokens/$token?access_token=$newtoken");
+
+$data1 = json_decode($data);
+if($data1->consumptionState==1)
+{
+		echo "do not try to insert data";
+}
+else
+{
+		echo  "insert data into db";
+}
+
+?>
+
+// for creating refresh token use https://developers.google.com/android-publisher/authorization and save it and use it again and again to getting net access token
